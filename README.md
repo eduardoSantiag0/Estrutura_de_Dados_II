@@ -19,4 +19,4 @@
     - Estático - Endereçaamento Aberto
     - Dinâmico
 
-### Professor: Luciano A. Digiampietri
+#### Professor: Luciano A. Digiampietri
