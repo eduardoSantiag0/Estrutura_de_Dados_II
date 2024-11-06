@@ -93,7 +93,6 @@ int Grafo::verificarGrauVertice (int v)
     for (int i = 0; i < numVertices; i++) 
         if (matriz[v][i]) grau++;
     
-
     return grau;
 
 }

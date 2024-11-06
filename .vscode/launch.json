@@ -8,8 +8,8 @@
       "args": [],
       "stopAtEntry": false,
       "externalConsole": true,
-      "cwd": "e:/ProjetosProgramming/AED2/Aula-02",
-      "program": "e:/ProjetosProgramming/AED2/Aula-02/build/Debug/outDebug",
+      "cwd": "e:/ProjetosProgramming/AED2/Aula-03",
+      "program": "e:/ProjetosProgramming/AED2/Aula-03/build/Debug/outDebug",
       "MIMode": "gdb",
       "miDebuggerPath": "gdb",
       "setupCommands": [
