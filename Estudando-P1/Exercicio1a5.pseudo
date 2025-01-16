@@ -1,0 +1,130 @@
+// 1. Descreva uma classe para representar grafos, implementando:
+// • construtor: devolve um grafos com V v ́ertices, sem arestas;
+// • inclui aresta: inclui uma aresta u−v no grafo;
+// • remove aresta: remove a aresta u−v (se existir) do grafo;
+
+class Grafo do
+    
+    constructor(v) do
+        this->numVertices = v;
+        this->vertice = [];
+
+        for i = 1 to v do 
+            this->vertice[i] = [];
+        end
+    end
+
+    function incluiAresta(origem, destino) do
+        vertice[origem].add(destino);
+        vertice[destino].add(origem);
+    end
+
+
+    function removeAresta(origem, destino) do
+        for i = 1 in vertice[origem] do 
+            if (vertice[origem][i] == destino) do 
+                vertice[origem].remove(i);
+                break;
+            end
+        end
+        
+        for i = 1 in vertice[destino] do 
+            if (vertice[destino][i] == origem)  do 
+                vertice[destino].remove(i);
+                break;
+            end
+        end
+    end
+
+end
+
+
+// 2. O que muda nas funcoes acima para digrafos / dirigido?
+function incluiAresta(origem, destino) do
+    vertice[origem].add(destino);
+end
+
+
+function removeAresta(origem, destino) do
+    for i = 1 in vertice[origem] do 
+        if (vertice[origem][i] == destino) do 
+            vertice[origem].remove(i);
+            break;
+        end
+    end
+end
+
+
+// 3. Escreva uma função achaFonte que devolve, se existir, um vértice fonte no grafo e -1, caso contrario.
+// Uma fonte (= source) é um vértice que tem grau de entrada nulo
+function achaFonte() do
+
+    // Iniciar todos com 0
+    vetoresIn[numVertices];
+    for i = 1 to numVertices do 
+        vetoresIn[i] = 0; 
+    end
+
+    for i = 1 to numVertices do
+        for j = 1 to vertice[i].size() do 
+            vetoresIn[vertice[i][j]]++;
+        end
+    end
+
+    for i = 1 to numVertices do 
+        if vetoresIn[i] == 0 do 
+            return i;
+        end
+    end
+
+    return -1;
+
+end
+
+
+// 4. Escreva uma função testaCaminho que recebe um vetor seq e verifica se seq  ́e um caminho no grafo.
+
+function testaCaminho (seq[]) do 
+    
+    for i = 1 to seq.size() - 1 do 
+        // pegar vetor de i
+        origem = seq[i];
+        destino = seq[i+1];
+        // ver se tem caminho para seq[i+1]
+        if not vertice[destino].contains(destino) do 
+            return false
+        end
+    end
+
+    return true;
+end
+
+// 5. Escreva uma função kcaminho que recebe dois vertices u e v e um inteiro k e verifica se existe no grafo um caminho de comprimento menor ou igual a k
+
+function kcaminho (u, v, k) do 
+
+    // origem -> u
+    // destino -> v
+
+    // Caso base: se k < 0, não há caminho válido
+    if k < 0 do
+        return false;
+    end
+
+    // Caso base: se u == v, encontrou o destino
+    if u == v do
+        return true;
+    end
+
+    // Para cada vizinho, faz uma chamada recursiva 
+    // para verificar se existe um caminho de comprimento k − 1 
+    // a partir do vizinho até v
+    
+    for vizinho in vertice[u] do
+        if kcaminho(vizinho, v, k - 1)
+            return true;
+    end
+
+    return false;
+
+end

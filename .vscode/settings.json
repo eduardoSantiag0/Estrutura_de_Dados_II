@@ -99,6 +99,9 @@
     "stdexcept": "cpp",
     "streambuf": "cpp",
     "typeinfo": "cpp",
-    "list": "cpp"
+    "list": "cpp",
+    "cstring": "cpp",
+    "ctime": "cpp",
+    "iomanip": "cpp"
   }
 }
