@@ -13,6 +13,9 @@
 #include <cstdlib>
 #include <cmath>
 
+#include <bits/stdc++.h>
+#include <algorithm>
+
 // #define true 1
 // #define false 0
 // typedef int boolean;
@@ -164,7 +167,7 @@ void exibeArranjoInteiros(int* arranjo, int n){
 
 //todo FUNÇÕES QUE DEVEM SER COMPLETADAS PARA RESOLVER O EP 
 
-// ENTRADA: Recebe dois vertices
+// ENTRADA: Recebe dois vertices ( v e y )
 // SAIDA: Retorna os vertices que ambos tem como vizinho
 void auxRetornaVizinhosEmComum (const Grafo& g, int v, int y, std::vector<int>& vizinhos) {
 
@@ -306,37 +309,92 @@ void alocacaoDeRecursos(const Grafo& g, int v, float* coeficientes) {
  * dividido pela raiz do número de (Vizinhos de V * Vizihnos de Y)
 */
 void similaridadeCosseno(const Grafo& g, int v, float* coeficientes) {
-
-    int numeroVizinhosDeV = retornaGrauDoVertice(g, v);
-
     for (int y = 0; y < g.numVertices; y++) {
+        if (y == v) {
+            coeficientes[y] = 1.0; // 
+            continue;
+        }
 
-        float out = 0.0;
-        
-        std::vector<int> vetorTemp;
-        auxRetornaVizinhosEmComum(g, v, y, vetorTemp);
+        int emComum = 0; // Número de vizinhos em comum
+        int grauV = 0;   // Grau do vértice v
+        int grauY = 0;   // Grau do vértice y
 
-        int numeroVizinhosDeY = retornaGrauDoVertice(g, y);
+        //* Calcula os vizinhos em comum e os graus
+        for (int z = 0; z < g.numVertices; z++) {
+            if (g.matriz[v][z]) grauV++;     // Conta vizinhos de v
+            if (g.matriz[y][z]) grauY++;     // Conta vizinhos de y
+            if (g.matriz[v][z] && g.matriz[y][z]) emComum++; // Vizinhos em comum
+        }
 
-        float denominador = sqrt(numeroVizinhosDeV * numeroVizinhosDeV);
-
-        if (denominador == 0) 
-            denominador = -1.0;
-
-        out = vetorTemp.size() / denominador;
-
-        coeficientes[y] = out;
-        
+        // Evita divisão por zero ao calcular o denominador
+        if (grauV > 0 && grauY > 0) {
+            coeficientes[y] = emComum / (std::sqrt(grauV * grauY));
+        } else {
+            coeficientes[y] = 0.0; // Semelhança é zero se não houver grau
+        }
     }
 }
 
-
+// 2 ∗|Γ(x) ∩Γ(y)| -> Número de Intersecção entre os vizinhos de V e de y
+// |Γ(x)|+ |Γ(y)| -> Número de vizinhos de V + Y
 void coeficienteDeDice(const Grafo& g, int v, float* coeficientes) {
-    /* Complete o código desta função */
+    for (int y = 0; y < g.numVertices; y++) {
+        if (v == y) {
+            coeficientes[y] == 1;
+            continue;
+        }
+
+        int emComum = 0; 
+        int grauV = 0;   
+        int grauY = 0;   
+
+        for (int z = 0 ; z < g.numVertices; z++) {
+            if (g.matriz[v][z]) grauV++;
+            if (g.matriz[y][z]) grauY++;
+            if (g.matriz[v][z] && g.matriz[y][z]) emComum++; 
+        }
+
+        float denominador = grauV + grauY;
+
+        if (denominador == 0) {
+            coeficientes[y] = -1;
+        } else {
+            coeficientes[y] = (2.0f * emComum) / denominador;
+        }
+
+    }
+
+
 }
 
+// |Γ(x) ∩Γ(y)| -> Número de Intersecção entre os vizinhos de V e de y
+// min(|Γ(x)|, |Γ(y)|)
 void HPI(Grafo& g, int v, float* coeficientes) {
-/* Complete o codigo desta funcao */
+    for (int y = 0; y < g.numVertices; y++) {
+        if (v == y) {
+            coeficientes[y] == 1;
+            continue;
+        }
+
+        int emComum = 0; 
+        int grauV = 0;   
+        int grauY = 0;   
+
+        for (int z = 0 ; z < g.numVertices; z++) {
+            if (g.matriz[v][z]) grauV++;
+            if (g.matriz[y][z]) grauY++;
+            if (g.matriz[v][z] && g.matriz[y][z]) emComum++; 
+        }
+
+        float denominador = std::min(grauV, grauY);
+
+        if (denominador == 0) {
+            coeficientes[y] = -1.0;
+        } else {
+            coeficientes[y] = emComum / denominador;
+        }
+
+    }
 
 }
 
@@ -344,7 +402,31 @@ void HPI(Grafo& g, int v, float* coeficientes) {
 /* Hub Depressed Index */
 void HDI(Grafo& g, int v, float* coeficientes){
 
-/* Complete o codigo desta funcao */
+    for (int y = 0; y < g.numVertices; y++) {
+        if (v == y) {
+            coeficientes[y] == 1;
+            continue;
+        }
+
+        int emComum = 0; 
+        int grauV = 0;   
+        int grauY = 0;   
+
+        for (int z = 0 ; z < g.numVertices; z++) {
+            if (g.matriz[v][z]) grauV++;
+            if (g.matriz[y][z]) grauY++;
+            if (g.matriz[v][z] && g.matriz[y][z]) emComum++; 
+        }
+
+        float denominador = std::max(grauV, grauY);
+
+        if (denominador == 0) {
+            coeficientes[y] = -1.0;
+        } else {
+            coeficientes[y] = emComum / denominador;
+        }
+
+    }
 
 }
 
@@ -376,11 +458,6 @@ int main() {
   std::vector<int> auxVizinho; 
   auxRetornaVizinhosEmComum(g1, 0, 4, auxVizinho);
 
-//   for (int item : auxVizinho) {
-//     std::cout << item << " - "; 
-//   }
-//   std::cout << std::endl;
-
   printf("Vizinhos em Comum de v0:\n");
   vizinhosEmComum(g1, 0, vComum);
   exibeArranjoInteiros(vComum, n);
@@ -401,17 +478,17 @@ int main() {
   similaridadeCosseno(g1, 0, coeficientes);
   exibeArranjoReais(coeficientes, n);
 
-//   coeficienteDeDice(g1, 0, coeficientes);
-//   printf("Coeficiente de Dice de v0:\n");
-//   exibeArranjoReais(coeficientes, n);
+  coeficienteDeDice(g1, 0, coeficientes);
+  printf("Coeficiente de Dice de v0:\n");
+  exibeArranjoReais(coeficientes, n);
 
-//   HPI(g1, 0, coeficientes);
-//   printf("Indice HPI de v0:\n");
-//   exibeArranjoReais(coeficientes, n);
+  HPI(g1, 0, coeficientes);
+  printf("Indice HPI de v0:\n");
+  exibeArranjoReais(coeficientes, n);
 
-//   HDI(g1, 0, coeficientes);
-//   printf("Indice HDI de v0:\n");
-//   exibeArranjoReais(coeficientes, n);
+  HDI(g1, 0, coeficientes);
+  printf("Indice HDI de v0:\n");
+  exibeArranjoReais(coeficientes, n);
 
   printf("\n\nSEGUNDO EXEMPLO\n");
 
@@ -442,17 +519,17 @@ int main() {
   similaridadeCosseno(g1, 0, coeficientes);
   exibeArranjoReais(coeficientes, n);
 
-//   coeficienteDeDice(g1, 0, coeficientes);
-//   printf("Coeficiente de Dice de v0:\n");
-//   exibeArranjoReais(coeficientes, n);
+  coeficienteDeDice(g1, 0, coeficientes);
+  printf("Coeficiente de Dice de v0:\n");
+  exibeArranjoReais(coeficientes, n);
 
-//   HPI(g1, 0, coeficientes);
-//   printf("Indice HPI de v0:\n");
-//   exibeArranjoReais(coeficientes, n);
+  HPI(g1, 0, coeficientes);
+  printf("Indice HPI de v0:\n");
+  exibeArranjoReais(coeficientes, n);
 
-//   HDI(g1, 0, coeficientes);
-//   printf("Indice HDI de v0:\n");
-//   exibeArranjoReais(coeficientes, n);
+  HDI(g1, 0, coeficientes);
+  printf("Indice HDI de v0:\n");
+  exibeArranjoReais(coeficientes, n);
 
 
   /* Grafo gerado aleatoriamente - pode ficar diferente
@@ -534,43 +611,43 @@ int main() {
   exibeArranjoReais(coeficientes, n);
 
 
-//   coeficienteDeDice(g2, 0, coeficientes);
-//   printf("Coeficiente de Dice de v0:\n");
-//   exibeArranjoReais(coeficientes, n);
+  coeficienteDeDice(g2, 0, coeficientes);
+  printf("Coeficiente de Dice de v0:\n");
+  exibeArranjoReais(coeficientes, n);
 
-//   printf("Coeficiente de Dice de v1:\n");
-//   coeficienteDeDice(g2, 1, coeficientes);
-//   exibeArranjoReais(coeficientes, n);
+  printf("Coeficiente de Dice de v1:\n");
+  coeficienteDeDice(g2, 1, coeficientes);
+  exibeArranjoReais(coeficientes, n);
 
-//   printf("Coeficiente de Dice de v5:\n");
-//   coeficienteDeDice(g2, 5, coeficientes);
-//   exibeArranjoReais(coeficientes, n);
+  printf("Coeficiente de Dice de v5:\n");
+  coeficienteDeDice(g2, 5, coeficientes);
+  exibeArranjoReais(coeficientes, n);
 
 
-//   HPI(g2, 0, coeficientes);
-//   printf("Indice HPI de v0:\n");
-//   exibeArranjoReais(coeficientes, n);
+  HPI(g2, 0, coeficientes);
+  printf("Indice HPI de v0:\n");
+  exibeArranjoReais(coeficientes, n);
 
-//   printf("Indice HPI de v1:\n");
-//   HPI(g2, 1, coeficientes);
-//   exibeArranjoReais(coeficientes, n);
+  printf("Indice HPI de v1:\n");
+  HPI(g2, 1, coeficientes);
+  exibeArranjoReais(coeficientes, n);
 
-//   printf("Indice HPI de v5:\n");
-//   HPI(g2, 5, coeficientes);
-//   exibeArranjoReais(coeficientes, n);
+  printf("Indice HPI de v5:\n");
+  HPI(g2, 5, coeficientes);
+  exibeArranjoReais(coeficientes, n);
   
   
-//   HDI(g2, 0, coeficientes);
-//   printf("Indice HDI de v0:\n");
-//   exibeArranjoReais(coeficientes, n);
+  HDI(g2, 0, coeficientes);
+  printf("Indice HDI de v0:\n");
+  exibeArranjoReais(coeficientes, n);
 
-//   printf("Indice HDI de v1:\n");
-//   HDI(g2, 1, coeficientes);
-//   exibeArranjoReais(coeficientes, n);
+  printf("Indice HDI de v1:\n");
+  HDI(g2, 1, coeficientes);
+  exibeArranjoReais(coeficientes, n);
 
-//   printf("Indice HDI de v5:\n");
-//   HDI(g2, 5, coeficientes);
-//   exibeArranjoReais(coeficientes, n);
+  printf("Indice HDI de v5:\n");
+  HDI(g2, 5, coeficientes);
+  exibeArranjoReais(coeficientes, n);
 
   return 0;  
 }
