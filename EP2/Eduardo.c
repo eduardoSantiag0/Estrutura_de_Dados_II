@@ -310,7 +310,7 @@ void liberaLista(PONT atual){
 /* Funcao que exibe um arranjo, representando um ciclo.
 */
 void exibeCiclo(int* arranjo, int n){
-  printf("Ordem das cidades:");
+  printf("Ordem das cidades por Grace, Gilbert e Sylvia:");
   int x, y;
   for (x=0; x<n; x++){
     printf(" %i",arranjo[x]);
@@ -320,26 +320,62 @@ void exibeCiclo(int* arranjo, int n){
 
 
 /* Variaveis Globais usadas para resolver o problema */
-int* cicloAtual;
-int* melhorCiclo;
 bool* visitado;
+int* melhorCiclo;
 Peso melhorValor;
+int* cicloAtual;
 Peso valorAtual;
 
+Peso obterPeso(Grafo* g, int v1, int v2) {
+  if (!g || v1 < 0 || v2 < 0 || v1 >= g->numVertices || v2 >= g->numVertices) return -1;
+  ElemLista* atual = g->A[v1];
+  while (atual) {
+    if (atual->vertice == v2) return atual->peso;
+    atual = atual->prox;
+  }
+  return -1;
+}
 
 /* Funcao auxiliar, potencialmente recursiva, que ira resolver
 o problema do caixeiro viajante.
 Esta funcao eh inicialmente chamada pela funcao caixeiroViajante */
-//TODOOOOOOOOOOOOO
-void caixeiroAux(Grafo*g, int atual, int numVisitados)
-{
-// Caso nao haja nenhuma solucao para o problema, 
-    // a funcao caixeiroAux nao dever ́a alterar o valor da variavel global melhorValor.
-// Caso haja solucao, 
-    // 1. Preencher o arranjo melhorCiclo com a ordem das cidades a serem visitadas partindo da cidade 0 [zero]) 
-    // 2. Atualizar o valor de melhorValor com o custo do melhor ciclo encontrado (ciclo com menor custo).
-}
+//* Caso nao haja nenhuma solucao para o problema, 
+    //* a funcao caixeiroAux nao dever ́a alterar o valor da variavel global melhorValor.
+//* Caso haja solucao, 
+    //* 1. Preencher o arranjo melhorCiclo com a ordem das cidades a serem visitadas partindo da cidade 0 [zero]) 
+    //* 2. Atualizar o valor de melhorValor com o custo do melhor ciclo encontrado (ciclo com menor custo).
+void caixeiroAux(Grafo* g, int atual, int numVisitados) {
+  visitado[atual] = true;
+  cicloAtual[numVisitados] = atual;
+  numVisitados++;
 
+  if (numVisitados == g->numVertices) {
+    Peso pesoVolta = obterPeso(g, atual, 0); // Verifica o peso da aresta de volta
+    if (pesoVolta > 0) {
+      Peso custoTotal = valorAtual + pesoVolta; 
+      if (custoTotal < melhorValor) { // Atualiza  o melhor ciclo
+        melhorValor = custoTotal;
+        for (int i = 0; i < g->numVertices; i++) { 
+          melhorCiclo[i] = cicloAtual[i];
+        }
+        melhorCiclo[g->numVertices] = 0;
+      }
+    }
+  } else { // Explora todos os vizinhos da cidade atual
+    ElemLista* vizinho = g->A[atual];
+    while (vizinho) {
+      if (!visitado[vizinho->vertice]) { 
+        valorAtual += vizinho->peso;
+        caixeiroAux(g, vizinho->vertice, numVisitados);
+        valorAtual -= vizinho->peso; //* BACKTRACKING: Após a recursão, o custo da aresta é subtraído, permitindo que a função explore outros caminhos sem afetar o cálculo do custo para outras cidades.
+      }
+      vizinho = vizinho->prox;
+    }
+  }
+
+  visitado[atual] = false; //* BACKTRACKING: Após explorar todos os vizinhos, a cidade atual é marcada como não visitada (backtracking), permitindo que outras cidades possam visitá-la em outras partes da recursão:
+  
+}
 
 /* Funcao principal / inicial para a resolucao do problema do Caixeiro
    Viajante. Esta funcao inicializa as variaveis globais e chama a funcao 
@@ -358,7 +394,8 @@ bool caixeiroViajante(Grafo* g){
   valorAtual = 0;
   cicloAtual[0] = 0;
   visitado[0] = true;
-  caixeiroAux(g, 0, 1);
+  caixeiroAux(g, 0, 0);
+  // caixeiroAux(g, 0, 1);
   if (melhorValor < INFINITO) return true;
   else return false;
 }
